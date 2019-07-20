@@ -58,11 +58,24 @@ final class JavaPong {
     }
 
     private void loop() {
+        long last = System.currentTimeMillis();
+
         while (!glfwWindowShouldClose(window)) {
+            long now = System.currentTimeMillis();
+
+            while (last < now) {
+                last += 16;
+                update(16);
+            }
+
             render();
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
+    }
+
+    private void update(final long timesliceMS) {
+        
     }
 
     private void run() {
