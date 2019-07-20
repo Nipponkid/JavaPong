@@ -22,7 +22,7 @@ final class JavaPong {
      * The window that will contain the OpenGL context to render to.
      */
     private long window;
-    
+
     private Paddle playerPaddle;
 
     private int shaderProgram;
@@ -77,7 +77,7 @@ final class JavaPong {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glUseProgram(shaderProgram);
         glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
     private void initGl() {
@@ -136,15 +136,21 @@ final class JavaPong {
         glBindVertexArray(vao);
 
         final float[] vertices = {
-                -0.5f, -0.5f,  0.0f,
-                 0.5f, -0.5f,  0.0f,
-                 0.0f,  0.5f,  0.0f
+                // left triangle
+                -0.0625f,  0.125f,  0.0f,  // top-left
+                -0.0625f, -0.125f,  0.0f,  // bottom-left
+                 0.0625f,  0.125f,  0.0f,  // top-right
+
+                // right triangle
+                -0.0625f, -0.125f,  0.0f,  // bottom-left
+                 0.0625f, -0.125f,  0.0f,  // bottom-right
+                 0.0625f,  0.125f,  0.0f   // top-right
         };
 
         final int vbo = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         try (final MemoryStack stack = stackPush()) {
-            final FloatBuffer buffer = memAllocFloat(9);
+            final FloatBuffer buffer = memAllocFloat(vertices.length);
             buffer.put(vertices);
             buffer.flip();
             glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
