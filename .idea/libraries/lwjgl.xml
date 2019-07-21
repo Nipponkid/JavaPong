@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="lwjgl-javadoc">
+  <library name="lwjgl">
     <CLASSES>
       <root url="jar://$USER_HOME$/Downloads/lwjgl-3/lwjgl/lwjgl-natives-linux.jar!/" />
       <root url="jar://$USER_HOME$/Downloads/lwjgl-3/lwjgl/lwjgl-natives-macos.jar!/" />

@@ -1,5 +1,8 @@
 package net.wesleybrown.JavaPong;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
@@ -52,7 +55,7 @@ final class JavaPong {
         GL.createCapabilities();    // Necessary for LWJGL to work correctly
 
         // Set up game
-        playerPaddle = new Paddle(100, 100);
+        playerPaddle = new Paddle(new Vector3f(-0.25f, 0.128f, 0.0f));
 
         initGl();
     }
@@ -75,7 +78,7 @@ final class JavaPong {
     }
 
     private void update(final long timesliceMS) {
-        
+
     }
 
     private void run() {
@@ -148,16 +151,20 @@ final class JavaPong {
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
+        final float x = playerPaddle.getPosition().x();
+        final float y = playerPaddle.getPosition().y();
+        final float halfWidth = playerPaddle.getWidth() / 2.0f;
+        final float halfHeight = playerPaddle.getHeight() / 2.0f;
         final float[] vertices = {
                 // left triangle
-                -0.0625f,  0.125f,  0.0f,  // top-left
-                -0.0625f, -0.125f,  0.0f,  // bottom-left
-                 0.0625f,  0.125f,  0.0f,  // top-right
+                x - halfWidth, y + halfHeight, 0.0f,    // top-left
+                x - halfWidth, y - halfHeight, 0.0f,    // bottom-left
+                x + halfWidth, y + halfHeight, 0.0f,    // top-right
 
                 // right triangle
-                -0.0625f, -0.125f,  0.0f,  // bottom-left
-                 0.0625f, -0.125f,  0.0f,  // bottom-right
-                 0.0625f,  0.125f,  0.0f   // top-right
+                x - halfWidth, y - halfHeight, 0.0f,    // bottom-left
+                x + halfWidth, y - halfHeight, 0.0f,    // bottom-right
+                x + halfWidth, y + halfHeight, 0.0f     // top-right
         };
 
         final int vbo = glGenBuffers();
