@@ -34,6 +34,10 @@ final class Paddle {
         return new Vector3f(this.position);
     }
 
+    void setPosition(final Vector3f position) {
+        this.position = position;
+    }
+
     float getWidth() {
         return width;
     }

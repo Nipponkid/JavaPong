@@ -2,7 +2,6 @@ package net.wesleybrown.JavaPong;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
@@ -99,7 +98,8 @@ final class JavaPong {
     private void initGl() {
         // Set up vertex shader
         final String vertexShaderSource = "#version 330 core\n" + "layout (location = 0) in vec3 aPos;\n\n"
-                + "void main()\n" + "{\n" + "    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n" + "}\n";
+                + "uniform mat4 transform;\n" + "void main()\n" + "{\n"
+                + "    gl_Position = transform * vec4(aPos, 1.0f);\n" + "}\n";
         final int vertexShaderName = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShaderName, vertexShaderSource);
         glCompileShader(vertexShaderName);
@@ -174,6 +174,21 @@ final class JavaPong {
             buffer.put(vertices);
             buffer.flip();
             glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
+        }
+
+        // Set up uniforms
+        final Matrix4f trans = new Matrix4f()   // Identity matrix
+                .rotate((float) Math.toRadians(90.0f), new Vector3f(0.0f, 0.0f, 1.0f))
+                .scale(new Vector3f(0.5f, 0.5f, 0.5f));
+
+        glUseProgram(shaderProgram);    // glGetUniformLocation requires a shader program to be being used
+        final int transformLocation = glGetUniformLocation(shaderProgram, "transform");
+        System.out.println(transformLocation);
+        try (final MemoryStack stack = stackPush()) {
+            final FloatBuffer buffer = memAllocFloat(16);
+            trans.get(buffer);  // Don't need to flip because JOML does for us
+            System.out.println(buffer.get(3));
+            glUniformMatrix4fv(transformLocation, false, buffer);
         }
 
         // Set up data pointers
