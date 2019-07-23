@@ -11,7 +11,6 @@ import java.nio.IntBuffer;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
@@ -29,6 +28,8 @@ final class JavaPong {
 
     private int shaderProgram;
     private int vao;
+
+    private PaddleRenderer paddleRenderer;
 
     private JavaPong() {
         // GLFW has to be initialized
@@ -55,6 +56,7 @@ final class JavaPong {
 
         // Set up game
         playerPaddle = new Paddle(new Vector3f(-0.25f, 0.128f, 0.0f));
+        paddleRenderer = new PaddleRenderer();
 
         initGl();
     }
@@ -76,8 +78,13 @@ final class JavaPong {
         }
     }
 
+    /**
+     * Update a game of Pong.
+     * @param timesliceMS
+     */
     private void update(final long timesliceMS) {
-
+        final Vector3f velocity = new Vector3f(0.0f, 0.01f, 0.0f);
+        playerPaddle.setPosition(playerPaddle.getPosition().add(velocity));
     }
 
     private void run() {
@@ -87,11 +94,17 @@ final class JavaPong {
         glfwTerminate();
     }
 
+    /**
+     * Render a game of Pong.
+     */
     private void render() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glUseProgram(shaderProgram);
         glBindVertexArray(vao);
+
+        paddleRenderer.render(playerPaddle);
+
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
@@ -151,35 +164,8 @@ final class JavaPong {
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
-        final float x = playerPaddle.getPosition().x();
-        final float y = playerPaddle.getPosition().y();
-        final float halfWidth = playerPaddle.getWidth() / 2.0f;
-        final float halfHeight = playerPaddle.getHeight() / 2.0f;
-        final float[] vertices = {
-                // left triangle
-                x - halfWidth, y + halfHeight, 0.0f,    // top-left
-                x - halfWidth, y - halfHeight, 0.0f,    // bottom-left
-                x + halfWidth, y + halfHeight, 0.0f,    // top-right
-
-                // right triangle
-                x - halfWidth, y - halfHeight, 0.0f,    // bottom-left
-                x + halfWidth, y - halfHeight, 0.0f,    // bottom-right
-                x + halfWidth, y + halfHeight, 0.0f     // top-right
-        };
-
-        final int vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        try (final MemoryStack stack = stackPush()) {
-            final FloatBuffer buffer = memAllocFloat(vertices.length);
-            buffer.put(vertices);
-            buffer.flip();
-            glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
-        }
-
         // Set up uniforms
-        final Matrix4f trans = new Matrix4f()   // Identity matrix
-                .rotate((float) Math.toRadians(90.0f), new Vector3f(0.0f, 0.0f, 1.0f))
-                .scale(new Vector3f(0.5f, 0.5f, 0.5f));
+        final Matrix4f trans = new Matrix4f();
 
         glUseProgram(shaderProgram);    // glGetUniformLocation requires a shader program to be being used
         final int transformLocation = glGetUniformLocation(shaderProgram, "transform");
@@ -190,10 +176,6 @@ final class JavaPong {
             System.out.println(buffer.get(3));
             glUniformMatrix4fv(transformLocation, false, buffer);
         }
-
-        // Set up data pointers
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, NULL);
-        glEnableVertexAttribArray(0);
 
         glBindVertexArray(vao); // unbind VAO
     }
