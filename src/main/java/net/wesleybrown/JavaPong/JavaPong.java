@@ -1,21 +1,65 @@
 package net.wesleybrown.JavaPong;
 
+import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR;
+import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
+import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_PROFILE;
+import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_CORE_PROFILE;
+import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_FORWARD_COMPAT;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
+import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
+import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
+import static org.lwjgl.glfw.GLFW.glfwInit;
+import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.glfw.GLFW.glfwPollEvents;
+import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
+import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
+import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
+import static org.lwjgl.glfw.GLFW.glfwTerminate;
+import static org.lwjgl.glfw.GLFW.glfwWindowHint;
+import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_TRUE;
+
+import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
+import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
+import static org.lwjgl.opengl.GL20.glAttachShader;
+import static org.lwjgl.opengl.GL20.glClear;
+import static org.lwjgl.opengl.GL20.glClearColor;
+import static org.lwjgl.opengl.GL20.glCompileShader;
+import static org.lwjgl.opengl.GL20.glCreateProgram;
+import static org.lwjgl.opengl.GL20.glCreateShader;
+import static org.lwjgl.opengl.GL20.glDeleteShader;
+import static org.lwjgl.opengl.GL20.glDrawArrays;
+import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
+import static org.lwjgl.opengl.GL20.glGetShaderiv;
+import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
+import static org.lwjgl.opengl.GL20.glGetUniformLocation;
+import static org.lwjgl.opengl.GL20.glLinkProgram;
+import static org.lwjgl.opengl.GL20.glShaderSource;
+import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
+import static org.lwjgl.opengl.GL20.glUseProgram;
+
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+
+import static org.lwjgl.system.MemoryStack.stackPush;
+import static org.lwjgl.system.MemoryUtil.*;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
-import static org.lwjgl.system.MemoryStack.stackPush;
-import static org.lwjgl.system.MemoryUtil.*;
 
 final class JavaPong {
 
@@ -54,6 +98,23 @@ final class JavaPong {
 
         GL.createCapabilities();    // Necessary for LWJGL to work correctly
 
+        // Set up keyboard input detection
+        glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
+            if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+                final Vector3f velocity = new Vector3f(0.0f, 0.01f, 0.0f);
+                playerPaddle.setVelocity(velocity);
+            } else if (key == GLFW_KEY_W && action == GLFW_RELEASE) {
+                final Vector3f velocity = new Vector3f();   // zero vector
+                playerPaddle.setVelocity(velocity);
+            } else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+                final Vector3f velocity = new Vector3f(0.0f, -0.01f, 0.0f);
+                playerPaddle.setVelocity(velocity);
+            } else if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
+                final Vector3f velocity = new Vector3f();
+                playerPaddle.setVelocity(velocity);
+            }
+        });
+
         // Set up game
         playerPaddle = new Paddle(new Vector3f(-0.25f, 0.128f, 0.0f));
         paddleRenderer = new PaddleRenderer();
@@ -83,8 +144,7 @@ final class JavaPong {
      * @param timesliceMS
      */
     private void update(final long timesliceMS) {
-        final Vector3f velocity = new Vector3f(0.0f, 0.01f, 0.0f);
-        playerPaddle.setPosition(playerPaddle.getPosition().add(velocity));
+        playerPaddle.update(timesliceMS);
     }
 
     private void run() {
@@ -169,11 +229,9 @@ final class JavaPong {
 
         glUseProgram(shaderProgram);    // glGetUniformLocation requires a shader program to be being used
         final int transformLocation = glGetUniformLocation(shaderProgram, "transform");
-        System.out.println(transformLocation);
         try (final MemoryStack stack = stackPush()) {
             final FloatBuffer buffer = memAllocFloat(16);
             trans.get(buffer);  // Don't need to flip because JOML does for us
-            System.out.println(buffer.get(3));
             glUniformMatrix4fv(transformLocation, false, buffer);
         }
 

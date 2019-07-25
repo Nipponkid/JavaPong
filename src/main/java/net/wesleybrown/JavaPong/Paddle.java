@@ -22,6 +22,11 @@ final class Paddle {
      */
     private Vector3f position;
 
+    /**
+     * This Paddle's current velocity.
+     */
+    private Vector3f velocity = new Vector3f();
+
     Paddle() {
         new Paddle(new Vector3f());
     }
@@ -38,11 +43,23 @@ final class Paddle {
         this.position = position;
     }
 
+    Vector3f getVelocity() {
+        return this.velocity;
+    }
+
+    void setVelocity(final Vector3f velocity) {
+        this.velocity = velocity;
+    }
+
     float getWidth() {
         return width;
     }
 
     float getHeight() {
         return height;
+    }
+
+    void update(final float timesliceMS) {
+        position.add(velocity);
     }
 }
