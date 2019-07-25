@@ -26,23 +26,10 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 
-import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
-import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
-import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
-import static org.lwjgl.opengl.GL20.glAttachShader;
 import static org.lwjgl.opengl.GL20.glClear;
 import static org.lwjgl.opengl.GL20.glClearColor;
-import static org.lwjgl.opengl.GL20.glCompileShader;
-import static org.lwjgl.opengl.GL20.glCreateProgram;
-import static org.lwjgl.opengl.GL20.glCreateShader;
-import static org.lwjgl.opengl.GL20.glDeleteShader;
 import static org.lwjgl.opengl.GL20.glDrawArrays;
-import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
-import static org.lwjgl.opengl.GL20.glGetShaderiv;
-import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
 import static org.lwjgl.opengl.GL20.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20.glLinkProgram;
-import static org.lwjgl.opengl.GL20.glShaderSource;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
@@ -70,10 +57,11 @@ final class JavaPong {
 
     private Paddle playerPaddle;
 
-    private int shaderProgram;
     private int vao;
 
     private PaddleRenderer paddleRenderer;
+
+    private PaddleShaderProgram paddleShaderProgram;
 
     private JavaPong() {
         // GLFW has to be initialized
@@ -160,7 +148,7 @@ final class JavaPong {
     private void render() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glUseProgram(shaderProgram);
+        glUseProgram(paddleShaderProgram.getHandle());
         glBindVertexArray(vao);
 
         paddleRenderer.render(playerPaddle);
@@ -169,56 +157,7 @@ final class JavaPong {
     }
 
     private void initGl() {
-        // Set up vertex shader
-        final String vertexShaderSource = "#version 330 core\n" + "layout (location = 0) in vec3 aPos;\n\n"
-                + "uniform mat4 transform;\n" + "void main()\n" + "{\n"
-                + "    gl_Position = transform * vec4(aPos, 1.0f);\n" + "}\n";
-        final int vertexShaderName = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShaderName, vertexShaderSource);
-        glCompileShader(vertexShaderName);
-
-        // Check vertex shader compilation
-        int vertexShaderCompileStatus;
-        try (final MemoryStack stack = stackPush()) {
-            final IntBuffer buffer = memAllocInt(1);
-            glGetShaderiv(vertexShaderName, GL_COMPILE_STATUS, buffer);
-            vertexShaderCompileStatus = buffer.get(0);
-        }
-
-        if (vertexShaderCompileStatus == 0) {
-            System.out.println(glGetShaderInfoLog(vertexShaderName));
-        }
-
-        // Set up fragment shader
-        final String fragmentShaderSource = "#version 330 core\n" + "out vec4 FragColor;\n\n" + "void main()\n"
-                + "{\n" + "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n" + "}\n";
-        final int fragmentShaderName = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShaderName, fragmentShaderSource);
-        glCompileShader(fragmentShaderName);
-
-        // Check fragment shader compilation
-        int fragmentShaderCompileStatus;
-        try (final MemoryStack stack = stackPush()) {
-            final IntBuffer buffer = memAllocInt(1);
-            glGetShaderiv(fragmentShaderName, GL_COMPILE_STATUS, buffer);
-            fragmentShaderCompileStatus = buffer.get(0);
-        }
-
-        if (fragmentShaderCompileStatus == 0) {
-            System.out.println(glGetShaderInfoLog(fragmentShaderName));
-        }
-
-        // Set up shader program
-        shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexShaderName);
-        glAttachShader(shaderProgram, fragmentShaderName);
-        glLinkProgram(shaderProgram);
-        // Shaders no longer needed after program is compiled
-        glDeleteShader(vertexShaderName);
-        glDeleteShader(fragmentShaderName);
-
-        // Check shader program
-        System.out.println(glGetProgramInfoLog(shaderProgram));
+        paddleShaderProgram = new PaddleShaderProgram();
 
         // Set up VAO
         vao = glGenVertexArrays();
@@ -227,8 +166,8 @@ final class JavaPong {
         // Set up uniforms
         final Matrix4f trans = new Matrix4f();
 
-        glUseProgram(shaderProgram);    // glGetUniformLocation requires a shader program to be being used
-        final int transformLocation = glGetUniformLocation(shaderProgram, "transform");
+        glUseProgram(paddleShaderProgram.getHandle());  // glGetUniformLocation requires a shader program to be being used
+        final int transformLocation = glGetUniformLocation(paddleShaderProgram.getHandle(), "transform");
         try (final MemoryStack stack = stackPush()) {
             final FloatBuffer buffer = memAllocFloat(16);
             trans.get(buffer);  // Don't need to flip because JOML does for us
