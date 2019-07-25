@@ -21,29 +21,17 @@ import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_TRUE;
+import static org.lwjgl.opengl.GL30.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL30.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL30.GL_TRUE;
+import static org.lwjgl.opengl.GL30.glClear;
+import static org.lwjgl.opengl.GL30.glClearColor;
 
-import static org.lwjgl.opengl.GL20.glClear;
-import static org.lwjgl.opengl.GL20.glClearColor;
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
-import static org.lwjgl.opengl.GL20.glUseProgram;
-
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
-
-import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.*;
 
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import org.lwjgl.opengl.GL;
-import org.lwjgl.system.MemoryStack;
-
-import java.nio.FloatBuffer;
 
 final class JavaPong {
 
@@ -55,14 +43,10 @@ final class JavaPong {
     private Paddle playerPaddle;
     private Paddle opponentPaddle;
 
-    private int vao;
-
     /**
      * Used to render both the player and opponent paddles.
      */
     private PaddleRenderer paddleRenderer;
-
-    private PaddleShaderProgram paddleShaderProgram;
 
     private JavaPong() {
         // GLFW has to be initialized
@@ -109,8 +93,6 @@ final class JavaPong {
         opponentPaddle = new Paddle(new Vector3f(0.25f, 0.128f, 0.0f));
 
         paddleRenderer = new PaddleRenderer();
-
-        initGl();
     }
 
     private void loop() {
@@ -151,32 +133,9 @@ final class JavaPong {
     private void render() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glUseProgram(paddleShaderProgram.getHandle());
-        glBindVertexArray(vao);
 
         paddleRenderer.render(playerPaddle);
         paddleRenderer.render(opponentPaddle);
-    }
-
-    private void initGl() {
-        paddleShaderProgram = new PaddleShaderProgram();
-
-        // Set up VAO
-        vao = glGenVertexArrays();
-        glBindVertexArray(vao);
-
-        // Set up uniforms
-        final Matrix4f trans = new Matrix4f();
-
-        glUseProgram(paddleShaderProgram.getHandle());  // glGetUniformLocation requires a shader program to be being used
-        final int transformLocation = glGetUniformLocation(paddleShaderProgram.getHandle(), "transform");
-        try (final MemoryStack stack = stackPush()) {
-            final FloatBuffer buffer = memAllocFloat(16);
-            trans.get(buffer);  // Don't need to flip because JOML does for us
-            glUniformMatrix4fv(transformLocation, false, buffer);
-        }
-
-        glBindVertexArray(vao); // unbind VAO
     }
 
     public static void main(String[] args) {
