@@ -23,12 +23,10 @@ import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 
 import static org.lwjgl.opengl.GL20.glClear;
 import static org.lwjgl.opengl.GL20.glClearColor;
-import static org.lwjgl.opengl.GL20.glDrawArrays;
 import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import static org.lwjgl.opengl.GL20.glUseProgram;
@@ -46,7 +44,6 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 final class JavaPong {
 
@@ -56,9 +53,13 @@ final class JavaPong {
     private long window;
 
     private Paddle playerPaddle;
+    private Paddle opponentPaddle;
 
     private int vao;
 
+    /**
+     * Used to render both the player and opponent paddles.
+     */
     private PaddleRenderer paddleRenderer;
 
     private PaddleShaderProgram paddleShaderProgram;
@@ -105,6 +106,8 @@ final class JavaPong {
 
         // Set up game
         playerPaddle = new Paddle(new Vector3f(-0.25f, 0.128f, 0.0f));
+        opponentPaddle = new Paddle(new Vector3f(0.25f, 0.128f, 0.0f));
+
         paddleRenderer = new PaddleRenderer();
 
         initGl();
@@ -152,8 +155,7 @@ final class JavaPong {
         glBindVertexArray(vao);
 
         paddleRenderer.render(playerPaddle);
-
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        paddleRenderer.render(opponentPaddle);
     }
 
     private void initGl() {

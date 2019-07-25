@@ -1,5 +1,7 @@
 package net.wesleybrown.JavaPong;
 
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
@@ -7,6 +9,7 @@ import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 
 import static org.lwjgl.opengl.GL20.GL_FLOAT;
+import static org.lwjgl.opengl.GL20.glDrawArrays;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 
@@ -58,5 +61,6 @@ final class PaddleRenderer {
 
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, NULL);
         glEnableVertexAttribArray(0);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 }
