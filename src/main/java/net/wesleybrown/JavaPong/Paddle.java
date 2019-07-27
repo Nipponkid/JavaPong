@@ -17,6 +17,8 @@ final class Paddle {
      */
     private float height = 0.5f;
 
+    private float scale;
+
     /**
      * The position of the center of this Paddle in world space.
      */
@@ -27,12 +29,17 @@ final class Paddle {
      */
     private Vector3f velocity = new Vector3f();
 
-    Paddle() {
-        new Paddle(new Vector3f());
+    static Paddle atPosition(final Vector3f position) {
+        return Paddle.atPositionAtScale(position, 1.0f);
     }
 
-    Paddle(final Vector3f position) {
+    static Paddle atPositionAtScale(final Vector3f position, final float scale) {
+        return new Paddle(position, scale);
+    }
+
+    private Paddle(final Vector3f position, final float scale) {
         this.position = new Vector3f(position);
+        this.scale = scale;
     }
 
     Vector3f getPosition() {
@@ -57,6 +64,10 @@ final class Paddle {
 
     float getHeight() {
         return height;
+    }
+
+    float getScale() {
+        return scale;
     }
 
     void update(final float timesliceMS) {

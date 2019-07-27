@@ -79,14 +79,14 @@ final class PaddleRenderer {
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, NULL);
         glEnableVertexAttribArray(0);
 
-        // Set up uniforms
-        final Matrix4f trans = new Matrix4f();
+        final Matrix4f transform = new Matrix4f().scale(paddle.getScale());
 
+        // Set up uniforms
         glUseProgram(shaderProgram.getHandle());  // glGetUniformLocation requires a shader program to be being used
         final int transformLocation = glGetUniformLocation(shaderProgram.getHandle(), "transform");
         try (final MemoryStack stack = stackPush()) {
             final FloatBuffer buffer = memAllocFloat(16);
-            trans.get(buffer);  // Don't need to flip because JOML does for us
+            transform.get(buffer);  // Don't need to flip because JOML does for us
             glUniformMatrix4fv(transformLocation, false, buffer);
         }
 

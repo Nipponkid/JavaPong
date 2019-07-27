@@ -42,11 +42,14 @@ final class JavaPong {
 
     private Paddle playerPaddle;
     private Paddle opponentPaddle;
+    private Ball ball;
 
     /**
      * Used to render both the player and opponent paddles.
      */
     private PaddleRenderer paddleRenderer;
+
+    private BallRenderer ballRenderer;
 
     private JavaPong() {
         // GLFW has to be initialized
@@ -89,10 +92,12 @@ final class JavaPong {
         });
 
         // Set up game
-        playerPaddle = new Paddle(new Vector3f(-0.25f, 0.128f, 0.0f));
-        opponentPaddle = new Paddle(new Vector3f(0.25f, 0.128f, 0.0f));
+        playerPaddle = Paddle.atPositionAtScale(new Vector3f(-0.25f, 0.128f, 0.0f), 0.5f);
+        opponentPaddle = Paddle.atPositionAtScale(new Vector3f(0.25f, 0.128f, 0.0f), 0.5f);
+        ball = new Ball(0.0f, 0.128f);
 
         paddleRenderer = new PaddleRenderer();
+        ballRenderer = new BallRenderer();
     }
 
     private void loop() {
@@ -136,6 +141,7 @@ final class JavaPong {
 
         paddleRenderer.render(playerPaddle);
         paddleRenderer.render(opponentPaddle);
+        ballRenderer.render(ball);
     }
 
     public static void main(String[] args) {
