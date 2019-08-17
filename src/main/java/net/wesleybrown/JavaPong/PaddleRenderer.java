@@ -24,6 +24,7 @@ import static org.lwjgl.system.MemoryUtil.memAllocFloat;
 import java.nio.FloatBuffer;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.system.MemoryStack;
@@ -79,14 +80,17 @@ final class PaddleRenderer {
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, NULL);
         glEnableVertexAttribArray(0);
 
-        final Matrix4f transform = new Matrix4f().scale(paddle.getScale());
+        final Matrix4f model = new Matrix4f().translate(paddle.getVelocity()).scale(new Vector3f(5.0f, 5.0f, 5.0f));
+        final Matrix4f view = new Matrix4f().lookAt(0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+        final Matrix4f projection = new Matrix4f().perspective((float) Math.toRadians(45.0f), 1.0f, 0.01f, 100.0f);
+        final Matrix4f mvp = projection.mul(view).mul(model);
 
         // Set up uniforms
         glUseProgram(shaderProgram.getHandle());  // glGetUniformLocation requires a shader program to be being used
         final int transformLocation = glGetUniformLocation(shaderProgram.getHandle(), "transform");
         try (final MemoryStack stack = stackPush()) {
             final FloatBuffer buffer = memAllocFloat(16);
-            transform.get(buffer);  // Don't need to flip because JOML does for us
+            mvp.get(buffer);  // Don't need to flip because JOML does for us
             glUniformMatrix4fv(transformLocation, false, buffer);
         }
 

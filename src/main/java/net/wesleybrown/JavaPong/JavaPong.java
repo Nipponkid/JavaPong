@@ -92,9 +92,9 @@ final class JavaPong {
         });
 
         // Set up game
-        playerPaddle = Paddle.atPositionAtScale(new Vector3f(-0.25f, 0.128f, 0.0f), 0.5f);
-        opponentPaddle = Paddle.atPositionAtScale(new Vector3f(0.25f, 0.128f, 0.0f), 0.5f);
-        ball = new Ball(0.0f, 0.128f);
+        playerPaddle = Paddle.atPositionAtScale(new Vector3f(-0.25f, 0.0f, 0.0f), 1.0f);
+        opponentPaddle = Paddle.atPositionAtScale(new Vector3f(0.25f, 0.0f, 0.0f), 1.0f);
+        ball = new Ball(0.0f, 0.0f, 0.0005f);
 
         paddleRenderer = new PaddleRenderer();
         ballRenderer = new BallRenderer();
@@ -123,6 +123,10 @@ final class JavaPong {
      */
     private void update(final long timesliceMS) {
         playerPaddle.update(timesliceMS);
+        ball.update(timesliceMS);
+        if (detectCollisions()) {
+            System.out.println("Collision Detected!");
+        }
     }
 
     private void run() {
@@ -142,6 +146,18 @@ final class JavaPong {
         paddleRenderer.render(playerPaddle);
         paddleRenderer.render(opponentPaddle);
         ballRenderer.render(ball);
+    }
+
+    private boolean detectCollisions() {
+        // If the x coordinate of the top-right point of the ball's collision box is >= the x coordinate of the
+        // top-left point of a paddle's collision box AND the x coordinate of the top-right point of a paddle's
+        // collision box is >= the x coordinate of the top-left point of the ball's collision box, then they are
+        // overalpping along the x axis and are thus colliding along the x axis.
+        boolean isXCollision = ball.getPosition().x() + (ball.getWidth() / 2.0f) >= playerPaddle.getPosition().x()
+                && playerPaddle.getPosition().x() + (playerPaddle.getWidth() / 2.0f) >= ball.getPosition().x();
+        boolean isYCollision = ball.getPosition().y() + (ball.getWidth() / 2.0f) >= playerPaddle.getPosition().y()
+                && playerPaddle.getPosition().y() + (playerPaddle.getWidth() / 2.0f) >= ball.getPosition().y();
+        return isXCollision && isYCollision;
     }
 
     public static void main(String[] args) {

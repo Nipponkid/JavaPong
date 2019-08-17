@@ -24,6 +24,7 @@ import static org.lwjgl.system.MemoryUtil.memAllocFloat;
 import java.nio.FloatBuffer;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import org.lwjgl.system.MemoryStack;
 
@@ -32,18 +33,6 @@ import org.lwjgl.system.MemoryStack;
  */
 final class BallRenderer {
 
-    private static float[] vertices = {
-            // left triangle
-            -1.0f,  1.0f,  0.0f,    // top-left
-            -1.0f, -1.0f,  0.0f,    // bottom-left
-            1.0f,  1.0f,  0.0f,    // top-right
-
-            // right triangle
-            -1.0f, -1.0f,  0.0f,    // bottom-left
-            1.0f, -1.0f,  0.0f,    // bottom-right
-            1.0f,  1.0f,  0.0f     // top-right
-    };
-
     private PaddleShaderProgram shaderProgram;    // The same shader is used for the ball and paddles
 
     BallRenderer() {
@@ -51,17 +40,12 @@ final class BallRenderer {
     }
 
     void render(final Ball ball) {
-        final float x = ball.getPosition().x();
-        final float y = ball.getPosition().y();
-
-        final float halfWidth = ball.getWidth() / 2.0f;
-        final float halfHeight = ball.getHeight() / 2.0f;
-
         final int vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
         final int vbo = glGenBuffers();
         try (final MemoryStack stack = stackPush()) {
+            final float[] vertices = ball.getModel().getVertices();
             final FloatBuffer buffer = memAllocFloat(vertices.length);
             buffer.put(vertices);
             buffer.flip();
@@ -69,13 +53,20 @@ final class BallRenderer {
             glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
         }
 
-        final Matrix4f transform = new Matrix4f().scale(0.05f);
+        final Matrix4f model = new Matrix4f().translate(ball.getPosition()).scale(ball.getUniformScale());
+        final Matrix4f view = new Matrix4f().lookAt(0.0f, 0.0f, 0.02f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+        final Matrix4f projection = new Matrix4f().perspective((float) Math.toRadians(45.0f), 1.0f, 0.01f, 100.0f);
+
+        // The mul method of the JOML Matrix4f class post multiplies, which is what OpenGL expects. So, if we want to
+        // create an mvp matrix, we have to multiply the parts in the order of model, view, and then projection
+        // starting from the right hand side.
+        final Matrix4f mvp = projection.mul(view).mul(model);
 
         glUseProgram(shaderProgram.getHandle());
         final int transformLocation = glGetUniformLocation(shaderProgram.getHandle(), "transform");
         try (final MemoryStack stack = stackPush()) {
             final FloatBuffer buffer = memAllocFloat(16);
-            transform.get(buffer);
+            mvp.get(buffer);
             glUniformMatrix4fv(transformLocation, false, buffer);
         }
 
