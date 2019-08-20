@@ -24,28 +24,27 @@ import static org.lwjgl.system.MemoryUtil.memAllocFloat;
 import java.nio.FloatBuffer;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 import org.lwjgl.system.MemoryStack;
 
 /**
- * Renders Balls.
+ * Renders GameObjects.
  */
-final class BallRenderer {
+final class GameObjectRenderer {
 
     private PaddleShaderProgram shaderProgram;    // The same shader is used for the ball and paddles
 
-    BallRenderer() {
+    GameObjectRenderer() {
         shaderProgram = new PaddleShaderProgram();
     }
 
-    void render(final Ball ball) {
+    void render(final GameObject gameObject) {
         final int vao = glGenVertexArrays();
         glBindVertexArray(vao);
 
         final int vbo = glGenBuffers();
         try (final MemoryStack stack = stackPush()) {
-            final float[] vertices = ball.getModel().getVertices();
+            final float[] vertices = gameObject.getModel().getVertices();
             final FloatBuffer buffer = memAllocFloat(vertices.length);
             buffer.put(vertices);
             buffer.flip();
@@ -53,7 +52,7 @@ final class BallRenderer {
             glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
         }
 
-        final Matrix4f model = new Matrix4f().translate(ball.getPosition()).scale(ball.getUniformScale());
+        final Matrix4f model = new Matrix4f().translate(gameObject.getPosition()).scale(gameObject.getScale());
         final Matrix4f view = new Matrix4f().lookAt(0.0f, 0.0f, 0.02f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
         final Matrix4f projection = new Matrix4f().perspective((float) Math.toRadians(45.0f), 1.0f, 0.01f, 100.0f);
 
