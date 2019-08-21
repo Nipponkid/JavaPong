@@ -19,7 +19,7 @@ final class GameObject {
         this.model = model;
         this.position = position;
         this.scale = scale;
-        this.velocity = new Vector3f(-0.0001f, 0.0f, 0.0f);
+        this.velocity = new Vector3f(0.0f, 0.0f, 0.0f);
     }
 
     void update(final float timesliceMS) {
@@ -40,5 +40,13 @@ final class GameObject {
 
     Model getModel() {
         return this.model;
+    }
+
+    Vector3f getVelocity() {
+        return this.velocity;
+    }
+
+    void setVelocity(final Vector3f velocity) {
+        this.velocity = velocity;
     }
 }

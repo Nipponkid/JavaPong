@@ -40,14 +40,9 @@ final class JavaPong {
      */
     private long window;
 
-    private Paddle playerPaddle;
-    private Paddle opponentPaddle;
+    private GameObject playerPaddle;
+    private GameObject opponentPaddle;
     private GameObject ball;
-
-    /**
-     * Used to render both the player and opponent paddles.
-     */
-    private PaddleRenderer paddleRenderer;
 
     private GameObjectRenderer gameObjectRenderer;
 
@@ -77,13 +72,13 @@ final class JavaPong {
         // Set up keyboard input detection
         glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
             if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-                final Vector3f velocity = new Vector3f(0.0f, 0.01f, 0.0f);
+                final Vector3f velocity = new Vector3f(0.0f, 0.1f, 0.0f);
                 playerPaddle.setVelocity(velocity);
             } else if (key == GLFW_KEY_W && action == GLFW_RELEASE) {
                 final Vector3f velocity = new Vector3f();   // zero vector
                 playerPaddle.setVelocity(velocity);
             } else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-                final Vector3f velocity = new Vector3f(0.0f, -0.01f, 0.0f);
+                final Vector3f velocity = new Vector3f(0.0f, -0.1f, 0.0f);
                 playerPaddle.setVelocity(velocity);
             } else if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
                 final Vector3f velocity = new Vector3f();
@@ -92,12 +87,10 @@ final class JavaPong {
         });
 
         // Set up game
-        playerPaddle = Paddle.atPositionAtScale(new Vector3f(-0.25f, 0.0f, 0.0f), 1.0f);
-        opponentPaddle = Paddle.atPositionAtScale(new Vector3f(0.25f, 0.0f, 0.0f), 1.0f);
-        ball = new GameObject("Ball",
-                Model.SQUARE, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.0005f, 0.0005f, 1.0f));
+        playerPaddle = new GameObject("Player Paddle", Model.SQUARE, new Vector3f(1.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
+        opponentPaddle = new GameObject("Opponent Paddle", Model.SQUARE, new Vector3f(-1.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
+        ball = new GameObject("Ball", Model.SQUARE, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.25f, 0.25f, 1.0f));
 
-        paddleRenderer = new PaddleRenderer();
         gameObjectRenderer = new GameObjectRenderer();
     }
 
@@ -144,8 +137,8 @@ final class JavaPong {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        paddleRenderer.render(playerPaddle);
-        paddleRenderer.render(opponentPaddle);
+        gameObjectRenderer.render(playerPaddle);
+        gameObjectRenderer.render(opponentPaddle);
         gameObjectRenderer.render(ball);
     }
 
@@ -155,9 +148,9 @@ final class JavaPong {
         // collision box is >= the x coordinate of the top-left point of the ball's collision box, then they are
         // overalpping along the x axis and are thus colliding along the x axis.
         boolean isXCollision = ball.getPosition().x() + (ball.getScale().x() / 2.0f) >= playerPaddle.getPosition().x()
-                && playerPaddle.getPosition().x() + (playerPaddle.getWidth() / 2.0f) >= ball.getPosition().x();
+                && playerPaddle.getPosition().x() + (playerPaddle.getScale().x() / 2.0f) >= ball.getPosition().x();
         boolean isYCollision = ball.getPosition().y() + (ball.getScale().y() / 2.0f) >= playerPaddle.getPosition().y()
-                && playerPaddle.getPosition().y() + (playerPaddle.getWidth() / 2.0f) >= ball.getPosition().y();
+                && playerPaddle.getPosition().y() + (playerPaddle.getScale().y() / 2.0f) >= ball.getPosition().y();
         return isXCollision && isYCollision;
     }
 
