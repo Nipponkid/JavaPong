@@ -1,4 +1,4 @@
-package net.wesleybrown.JavaPong;
+package net.wesleybrown.javapong;
 
 final class Model {
 

@@ -1,4 +1,4 @@
-package net.wesleybrown.JavaPong;
+package net.wesleybrown.javapong;
 
 import static org.lwjgl.opengl.GL30.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL30.GL_FLOAT;

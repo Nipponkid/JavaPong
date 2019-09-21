@@ -1,4 +1,4 @@
-package net.wesleybrown.JavaPong;
+package net.wesleybrown.javapong;
 
 import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;

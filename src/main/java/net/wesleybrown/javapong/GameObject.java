@@ -1,4 +1,4 @@
-package net.wesleybrown.JavaPong;
+package net.wesleybrown.javapong;
 
 import org.joml.Vector3f;
 
