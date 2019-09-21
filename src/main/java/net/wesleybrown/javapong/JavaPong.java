@@ -44,8 +44,6 @@ final class JavaPong {
     private GameObject opponentPaddle;
     private GameObject ball;
 
-    private GameObjectRenderer gameObjectRenderer;
-
     private JavaPong() {
         // GLFW has to be initialized
         if (!glfwInit()) {
@@ -90,8 +88,6 @@ final class JavaPong {
         playerPaddle = new GameObject("Player Paddle", Model.SQUARE, new Vector3f(1.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
         opponentPaddle = new GameObject("Opponent Paddle", Model.SQUARE, new Vector3f(-1.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
         ball = new GameObject("Ball", Model.SQUARE, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.25f, 0.25f, 1.0f));
-
-        gameObjectRenderer = new GameObjectRenderer();
     }
 
     private void loop() {
@@ -116,11 +112,9 @@ final class JavaPong {
      * @param timesliceMS
      */
     private void update(final long timesliceMS) {
-        playerPaddle.update(timesliceMS);
         ball.update(timesliceMS);
-        if (detectCollisions()) {
-            System.out.println("Collision Detected!");
-        }
+        playerPaddle.update(timesliceMS);
+        opponentPaddle.update(timesliceMS);
     }
 
     private void run() {
@@ -137,21 +131,9 @@ final class JavaPong {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        gameObjectRenderer.render(playerPaddle);
-        gameObjectRenderer.render(opponentPaddle);
-        gameObjectRenderer.render(ball);
-    }
-
-    private boolean detectCollisions() {
-        // If the x coordinate of the top-right point of the ball's collision box is >= the x coordinate of the
-        // top-left point of a paddle's collision box AND the x coordinate of the top-right point of a paddle's
-        // collision box is >= the x coordinate of the top-left point of the ball's collision box, then they are
-        // overalpping along the x axis and are thus colliding along the x axis.
-        boolean isXCollision = ball.getPosition().x() + (ball.getScale().x() / 2.0f) >= playerPaddle.getPosition().x()
-                && playerPaddle.getPosition().x() + (playerPaddle.getScale().x() / 2.0f) >= ball.getPosition().x();
-        boolean isYCollision = ball.getPosition().y() + (ball.getScale().y() / 2.0f) >= playerPaddle.getPosition().y()
-                && playerPaddle.getPosition().y() + (playerPaddle.getScale().y() / 2.0f) >= ball.getPosition().y();
-        return isXCollision && isYCollision;
+        ball.render();
+        playerPaddle.render();
+        opponentPaddle.render();
     }
 
     public static void main(String[] args) {
