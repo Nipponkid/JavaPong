@@ -88,6 +88,7 @@ final class JavaPong {
         playerPaddle = new GameObject("Player Paddle", Model.SQUARE, new Vector3f(1.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
         opponentPaddle = new GameObject("Opponent Paddle", Model.SQUARE, new Vector3f(-1.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
         ball = new GameObject("Ball", Model.SQUARE, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.25f, 0.25f, 1.0f));
+        ball.setVelocity(new Vector3f(0.01f, 0.0f, 0.0f));
     }
 
     private void loop() {
@@ -115,6 +116,8 @@ final class JavaPong {
         ball.update(timesliceMS);
         playerPaddle.update(timesliceMS);
         opponentPaddle.update(timesliceMS);
+
+        simulateCollisions();
     }
 
     private void run() {
@@ -122,6 +125,16 @@ final class JavaPong {
 
         glfwDestroyWindow(window);
         glfwTerminate();
+    }
+
+    private void simulateCollisions() {
+        if (ball.isCollidingWith(playerPaddle)) {
+            System.out.println("ball is colliding with playerPaddle");
+        }
+
+        if (ball.isCollidingWith(opponentPaddle)) {
+            System.out.println("ball is colliding with opponentPaddle");
+        }
     }
 
     /**
