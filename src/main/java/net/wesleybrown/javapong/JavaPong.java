@@ -130,10 +130,12 @@ final class JavaPong {
     private void simulateCollisions() {
         if (ball.isCollidingWith(playerPaddle)) {
             System.out.println("ball is colliding with playerPaddle");
+            ball.respondToCollisionWith(playerPaddle);
         }
 
         if (ball.isCollidingWith(opponentPaddle)) {
             System.out.println("ball is colliding with opponentPaddle");
+            ball.respondToCollisionWith(opponentPaddle);
         }
     }
 

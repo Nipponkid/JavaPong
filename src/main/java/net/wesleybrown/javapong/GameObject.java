@@ -66,4 +66,13 @@ final class GameObject {
 
         return (xCollision && yCollision);
     }
+
+    void respondToCollisionWith(final GameObject other) {
+        if (position.x() < other.position.x()) {
+            System.out.println(name + " collided with " + other.name + " from the left");
+
+        } else {
+            System.out.println(name + " collided with " + other.name + " from the right");
+        }
+    }
 }

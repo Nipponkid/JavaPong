@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="net.wesleybrown.javapong in Java Pong" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
+    <module name="Java Pong" />
+    <option name="PACKAGE_NAME" value="net.wesleybrown.javapong" />
+    <option name="MAIN_CLASS_NAME" value="" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="package" />
+    <option name="PARAMETERS" value="" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
