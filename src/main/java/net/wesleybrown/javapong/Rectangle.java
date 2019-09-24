@@ -25,6 +25,8 @@ final class Rectangle {
     }
 
     boolean intersectsWith(final Rectangle other) {
-        return false;
+        final boolean isCollidingOverXAxis = (xMax >= other.xMin) && (xMin <= other.xMax);
+        final boolean isCollidingOverYAxis = (yMax >= other.yMin) && (yMin <= other.yMax);
+        return (isCollidingOverXAxis && isCollidingOverYAxis);
     }
 }

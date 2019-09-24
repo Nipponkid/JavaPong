@@ -20,8 +20,8 @@ public class RectangleTest {
                     new Rectangle(new Vector3f(1.0f, 0.0f, 0.0f), 0.999f, 1.0f)
                 },
                 {
-                    new Rectangle(new Vector3f(1.0f, 1.0f, 0.0f), 2.0f, 2.0f),
-                    new Rectangle(new Vector3f(-1.0f, -1.0f, 0.0f), 2.0f, 2.0f)
+                    new Rectangle(new Vector3f(1.001f, 1.001f, 0.0f), 2.0f, 2.0f),
+                    new Rectangle(new Vector3f(-1.001f, -1.001f, 0.0f), 2.0f, 2.0f)
                 }
         };
 
@@ -29,6 +29,22 @@ public class RectangleTest {
                 false,
                 false,
                 false
+        };
+
+        testIntersectsWith(expected, inputs);
+    }
+
+    @Test
+    public void testIntersectsWithOverlap() {
+        final Rectangle[][] inputs = {
+                {
+                    new Rectangle(new Vector3f(0.0f, 0.0f, 0.0f), 1.0f, 1.0f),
+                    new Rectangle(new Vector3f(0.5f, 0.0f, 0.0f), 1.0f, 1.0f)
+                }
+        };
+
+        final boolean[] expected = {
+                true
         };
 
         testIntersectsWith(expected, inputs);
