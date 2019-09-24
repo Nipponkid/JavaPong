@@ -43,28 +43,9 @@ final class GameObject {
     }
 
     boolean isCollidingWith(final GameObject other) {
-        final float THIS_HALF_WIDTH = scale.x() / 2.0f;
-        final float THIS_HALF_HEIGHT = scale.y() / 2.0f;
-
-        final float OTHER_HALF_WIDTH = other.scale.x() / 2.0f;
-        final float OTHER_HALF_HEIGHT = other.scale.y() / 2.0f;
-
-        final float X_MAX = position.x() + THIS_HALF_WIDTH;
-        final float X_MIN = position.x() - THIS_HALF_WIDTH;
-
-        final float OTHER_X_MAX = other.position.x() + OTHER_HALF_WIDTH;
-        final float OTHER_X_MIN = other.position.x() - OTHER_HALF_WIDTH;
-
-        final float Y_MAX = position.y() + THIS_HALF_HEIGHT;
-        final float Y_MIN = position.y() - THIS_HALF_HEIGHT;
-
-        final float OTHER_Y_MAX = other.position.y() + OTHER_HALF_HEIGHT;
-        final float OTHER_Y_MIN = other.position.y() - OTHER_HALF_HEIGHT;
-
-        final boolean xCollision = (X_MAX >= OTHER_X_MIN) && (X_MIN <= OTHER_X_MAX);
-        final boolean yCollision = (Y_MAX >= OTHER_Y_MIN) && (Y_MIN <= OTHER_Y_MAX);
-
-        return (xCollision && yCollision);
+        final Rectangle thisOverlap = new Rectangle(position, scale.x(), scale.y());
+        final Rectangle otherOverlap = new Rectangle(other.position, other.scale.x(), other.scale.y());
+        return thisOverlap.intersectsWith(otherOverlap);
     }
 
     void respondToCollisionWith(final GameObject other) {
