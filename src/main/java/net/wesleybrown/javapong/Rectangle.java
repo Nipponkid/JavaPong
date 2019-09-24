@@ -7,6 +7,8 @@ import org.joml.Vector3f;
  */
 final class Rectangle {
 
+    static final Rectangle EMPTY = new Rectangle(new Vector3f(0.0f, 0.0f, 0.0f), 0.0f, 0.0f);
+
     private final float xMin;
     private final float xMax;
 
@@ -28,5 +30,9 @@ final class Rectangle {
         final boolean isCollidingOverXAxis = (xMax >= other.xMin) && (xMin <= other.xMax);
         final boolean isCollidingOverYAxis = (yMax >= other.yMin) && (yMin <= other.yMax);
         return (isCollidingOverXAxis && isCollidingOverYAxis);
+    }
+
+    Rectangle intersectionWith(final Rectangle other) {
+        return Rectangle.EMPTY;
     }
 }

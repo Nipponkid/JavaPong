@@ -60,9 +60,41 @@ public class RectangleTest {
         testIntersectsWith(expected, inputs);
     }
 
+    @Test
+    public void testIntersectionWithNoOverlap() {
+        final Rectangle[][] inputs = {
+                {
+                    new Rectangle(new Vector3f(-1.0f, 0.0f, 0.0f), 1.0f, 1.0f),
+                    new Rectangle(new Vector3f(1.0f, 0.0f, 0.0f), 0.5f, 0.0f)
+                },
+                {
+                    new Rectangle(new Vector3f(0.0f, 0.0f, 0.0f), 1.0f, 1.0f),
+                    new Rectangle(new Vector3f(1.0f, 0.0f, 0.0f), 0.999f, 1.0f)
+                },
+                {
+                        new Rectangle(new Vector3f(1.001f, 1.001f, 0.0f), 2.0f, 2.0f),
+                        new Rectangle(new Vector3f(-1.001f, -1.001f, 0.0f), 2.0f, 2.0f)
+                }
+        };
+
+        final Rectangle[] expected = {
+                Rectangle.EMPTY,
+                Rectangle.EMPTY,
+                Rectangle.EMPTY
+        };
+
+        testIntersectionWith(expected, inputs);
+    }
+
     private void testIntersectsWith(final boolean[] expected, final Rectangle[][] inputs) {
         for (int i = 0; i < expected.length; i++) {
             assertEquals(expected[i], inputs[i][0].intersectsWith(inputs[i][1]));
+        }
+    }
+
+    private void testIntersectionWith(final Rectangle[] expected, final Rectangle[][] inputs) {
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i], inputs[i][0].intersectionWith(inputs[i][1]));
         }
     }
 }
