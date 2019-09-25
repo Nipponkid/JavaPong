@@ -70,13 +70,13 @@ final class JavaPong {
         // Set up keyboard input detection
         glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
             if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-                final Vector3f velocity = new Vector3f(0.0f, 0.1f, 0.0f);
+                final Vector3f velocity = new Vector3f(0.0f, 0.001f, 0.0f);
                 playerPaddle.setVelocity(velocity);
             } else if (key == GLFW_KEY_W && action == GLFW_RELEASE) {
                 final Vector3f velocity = new Vector3f();   // zero vector
                 playerPaddle.setVelocity(velocity);
             } else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-                final Vector3f velocity = new Vector3f(0.0f, -0.1f, 0.0f);
+                final Vector3f velocity = new Vector3f(0.0f, -0.001f, 0.0f);
                 playerPaddle.setVelocity(velocity);
             } else if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
                 final Vector3f velocity = new Vector3f();
@@ -88,7 +88,7 @@ final class JavaPong {
         playerPaddle = new GameObject("Player Paddle", Model.SQUARE, new Vector3f(1.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
         opponentPaddle = new GameObject("Opponent Paddle", Model.SQUARE, new Vector3f(-1.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
         ball = new GameObject("Ball", Model.SQUARE, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.25f, 0.25f, 1.0f));
-        ball.setVelocity(new Vector3f(0.01f, 0.0f, 0.0f));
+        ball.setVelocity(new Vector3f(0.001f, 0.0f, 0.0f));
     }
 
     private void loop() {

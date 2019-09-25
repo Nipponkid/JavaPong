@@ -23,7 +23,9 @@ final class GameObject {
     }
 
     void update(final float timesliceMS) {
-        this.position.add(this.velocity);
+        final Vector3f scaledVelocity = new Vector3f();
+        velocity.mul(timesliceMS, scaledVelocity);
+        this.position.add(scaledVelocity);
     }
 
     Vector3f position() {
