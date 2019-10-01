@@ -47,6 +47,9 @@ final class JavaPong {
     private GameObject topBoundary;
     private GameObject bottomBoundary;
 
+    private GameObject leftBoundary;
+    private GameObject rightBoundary;
+
     private JavaPong() {
         // GLFW has to be initialized
         if (!glfwInit()) {
@@ -88,14 +91,17 @@ final class JavaPong {
         });
 
         // Set up game
-        playerPaddle = new GameObject("Player Paddle", Model.SQUARE, new Vector3f(1.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
-        opponentPaddle = new GameObject("Opponent Paddle", Model.SQUARE, new Vector3f(-1.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
+        playerPaddle = new GameObject("Player Paddle", Model.SQUARE, new Vector3f(3.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
+        opponentPaddle = new GameObject("Opponent Paddle", Model.SQUARE, new Vector3f(-3.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
         ball = new GameObject("Ball", Model.SQUARE, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.25f, 0.25f, 1.0f));
         ball.setVelocity(new Vector3f(0.001f, 0.001f, 0.0f));
 
         // Boundaries
         topBoundary = new GameObject("Top Boundary", Model.SQUARE, new Vector3f(0.0f, 4.5f, 0.0f), new Vector3f(10.0f, 1.0f, 1.0f));
         bottomBoundary = new GameObject("Bottom Boundary", Model.SQUARE, new Vector3f(0.0f, -4.5f, 0.0f), new Vector3f(10.0f, 1.0f, 1.0f));
+
+        leftBoundary = new GameObject("Left Boundary", Model.SQUARE, new Vector3f(-4.5f, 0.0f, 0.0f), new Vector3f(1.0f, 10.0f, 1.0f));
+        rightBoundary = new GameObject("Right Boundary", Model.SQUARE, new Vector3f(4.5f, 0.0f, 0.0f), new Vector3f(1.0f, 10.0f, 1.0f));
     }
 
     private void loop() {
@@ -155,6 +161,11 @@ final class JavaPong {
         if (ball.isCollidingWith(bottomBoundary)) {
             ball.respondToCollisionWith(bottomBoundary);
         }
+
+        if (ball.isCollidingWith(leftBoundary) || ball.isCollidingWith(rightBoundary)) {
+            ball = new GameObject("Ball", Model.SQUARE, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.25f, 0.25f, 1.0f));
+            ball.setVelocity(new Vector3f(0.001f, 0.001f, 0.0f));
+        }
     }
 
     /**
@@ -170,6 +181,9 @@ final class JavaPong {
 
         topBoundary.render(deltaTime);
         bottomBoundary.render(deltaTime);
+
+        leftBoundary.render(deltaTime);
+        rightBoundary.render(deltaTime);
 
         glfwSwapBuffers(window);
     }
