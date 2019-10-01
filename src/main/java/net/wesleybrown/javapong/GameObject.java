@@ -1,5 +1,7 @@
 package net.wesleybrown.javapong;
 
+import java.util.Optional;
+
 import org.joml.Vector3f;
 
 final class GameObject {
@@ -28,34 +30,54 @@ final class GameObject {
         this.position.add(scaledVelocity);
     }
 
-    Vector3f position() {
-        return this.position;
-    }
-
-    Vector3f scale() {
-        return this.scale;
-    }
-
     void setVelocity(final Vector3f velocity) {
         this.velocity = velocity;
     }
 
-    void render() {
-        renderer.render(position, scale);
+    void render(final float deltaTime) {
+        final Vector3f extrapolatedVelocity = new Vector3f(velocity).mul(deltaTime);
+        final Vector3f extrapolatedPosition = new Vector3f(position).add(extrapolatedVelocity);
+        renderer.render(extrapolatedPosition, scale);
     }
 
     boolean isCollidingWith(final GameObject other) {
-        final Rectangle thisOverlap = new Rectangle(position, scale.x(), scale.y());
-        final Rectangle otherOverlap = new Rectangle(other.position, other.scale.x(), other.scale.y());
-        return thisOverlap.intersectsWith(otherOverlap);
+        final Rectangle thisBoundingBox = new Rectangle(position, scale.x(), scale.y());
+        final Rectangle otherBoundingBox = new Rectangle(other.position, other.scale.x(), other.scale.y());
+        return thisBoundingBox.intersectsWith(otherBoundingBox);
     }
 
     void respondToCollisionWith(final GameObject other) {
-        if (position.x() < other.position.x()) {
-            System.out.println(name + " collided with " + other.name + " from the left");
+        final Rectangle thisBoundingBox = new Rectangle(position, scale.x(), scale.y());
+        final Rectangle otherBoundingBox = new Rectangle(other.position, other.scale.x(), other.scale.y());
+        final Optional<Rectangle> overlap = thisBoundingBox.intersectionWith(otherBoundingBox);
 
-        } else {
-            System.out.println(name + " collided with " + other.name + " from the right");
+        if (overlap.isPresent()) {
+            final Rectangle overlapRec = overlap.get();
+            if (overlapRec.width() >= overlapRec.height()) {
+                if (position.y() < other.position.y()) {
+                    final Vector3f temp = new Vector3f(0.0f, -1.0f, 0.f);
+                    temp.mul(overlapRec.width()).mul(scale.y());
+                    position.add(temp);
+                    velocity = new Vector3f(velocity.x(), -velocity.y(), velocity.z());
+                } else {
+                    final Vector3f temp = new Vector3f(0.0f, 1.0f, 0.f);
+                    temp.mul(overlapRec.width()).mul(scale.y());
+                    position.add(temp);
+                    velocity = new Vector3f(velocity.x(), -velocity.y(), velocity.z());
+                }
+            } else {
+                if (position.x() < other.position.x()) {
+                    final Vector3f temp = new Vector3f(-1.0f, 0.0f, 0.0f);
+                    temp.mul(overlapRec.height()).mul(scale.x());
+                    position.add(temp);
+                    velocity = new Vector3f(-velocity.x(), velocity.y(), velocity.z());
+                } else {
+                    final Vector3f temp = new Vector3f(1.0f, 0.0f, 0.0f);
+                    temp.mul(overlapRec.height()).mul(scale.x());
+                    position.add(temp);
+                    velocity = new Vector3f(-velocity.x(), velocity.y(), velocity.z());
+                }
+            }
         }
     }
 }

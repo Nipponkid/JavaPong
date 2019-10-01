@@ -44,6 +44,9 @@ final class JavaPong {
     private GameObject opponentPaddle;
     private GameObject ball;
 
+    private GameObject topBoundary;
+    private GameObject bottomBoundary;
+
     private JavaPong() {
         // GLFW has to be initialized
         if (!glfwInit()) {
@@ -70,13 +73,13 @@ final class JavaPong {
         // Set up keyboard input detection
         glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
             if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-                final Vector3f velocity = new Vector3f(0.0f, 0.001f, 0.0f);
+                final Vector3f velocity = new Vector3f(0.0f, 0.01f, 0.0f);
                 playerPaddle.setVelocity(velocity);
             } else if (key == GLFW_KEY_W && action == GLFW_RELEASE) {
                 final Vector3f velocity = new Vector3f();   // zero vector
                 playerPaddle.setVelocity(velocity);
             } else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-                final Vector3f velocity = new Vector3f(0.0f, -0.001f, 0.0f);
+                final Vector3f velocity = new Vector3f(0.0f, -0.01f, 0.0f);
                 playerPaddle.setVelocity(velocity);
             } else if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
                 final Vector3f velocity = new Vector3f();
@@ -88,23 +91,32 @@ final class JavaPong {
         playerPaddle = new GameObject("Player Paddle", Model.SQUARE, new Vector3f(1.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
         opponentPaddle = new GameObject("Opponent Paddle", Model.SQUARE, new Vector3f(-1.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
         ball = new GameObject("Ball", Model.SQUARE, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.25f, 0.25f, 1.0f));
-        ball.setVelocity(new Vector3f(0.001f, 0.0f, 0.0f));
+        ball.setVelocity(new Vector3f(0.001f, 0.001f, 0.0f));
+
+        // Boundaries
+        topBoundary = new GameObject("Top Boundary", Model.SQUARE, new Vector3f(0.0f, 4.5f, 0.0f), new Vector3f(10.0f, 1.0f, 1.0f));
+        bottomBoundary = new GameObject("Bottom Boundary", Model.SQUARE, new Vector3f(0.0f, -4.5f, 0.0f), new Vector3f(10.0f, 1.0f, 1.0f));
     }
 
     private void loop() {
         long last = System.currentTimeMillis();
+        final long MS_PER_TICK = 16;
+        long accumulatedMS = 0;
 
         while (!glfwWindowShouldClose(window)) {
-            long now = System.currentTimeMillis();
+            final long now = System.currentTimeMillis();
+            final long elapsedMS = now - last;
+            last = now;
+            accumulatedMS += elapsedMS;
 
-            while (last < now) {
-                last += 16;
-                update(16);
+            glfwPollEvents();
+
+            while (accumulatedMS >= MS_PER_TICK) {
+                update(MS_PER_TICK);
+                accumulatedMS -= MS_PER_TICK;
             }
 
-            render();
-            glfwSwapBuffers(window);
-            glfwPollEvents();
+            render((float) (accumulatedMS / MS_PER_TICK));
         }
     }
 
@@ -117,7 +129,7 @@ final class JavaPong {
         playerPaddle.update(timesliceMS);
         opponentPaddle.update(timesliceMS);
 
-        simulateCollisions();
+        simulateCollisions(timesliceMS);
     }
 
     private void run() {
@@ -127,28 +139,39 @@ final class JavaPong {
         glfwTerminate();
     }
 
-    private void simulateCollisions() {
+    private void simulateCollisions(final long timesliceMS) {
         if (ball.isCollidingWith(playerPaddle)) {
-            System.out.println("ball is colliding with playerPaddle");
             ball.respondToCollisionWith(playerPaddle);
         }
 
         if (ball.isCollidingWith(opponentPaddle)) {
-            System.out.println("ball is colliding with opponentPaddle");
             ball.respondToCollisionWith(opponentPaddle);
+        }
+
+        if (ball.isCollidingWith(topBoundary)) {
+            ball.respondToCollisionWith(topBoundary);
+        }
+
+        if (ball.isCollidingWith(bottomBoundary)) {
+            ball.respondToCollisionWith(bottomBoundary);
         }
     }
 
     /**
      * Render a game of Pong.
      */
-    private void render() {
+    private void render(final float deltaTime) {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        ball.render();
-        playerPaddle.render();
-        opponentPaddle.render();
+        ball.render(deltaTime);
+        playerPaddle.render(deltaTime);
+        opponentPaddle.render(deltaTime);
+
+        topBoundary.render(deltaTime);
+        bottomBoundary.render(deltaTime);
+
+        glfwSwapBuffers(window);
     }
 
     public static void main(String[] args) {
