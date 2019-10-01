@@ -166,6 +166,10 @@ final class JavaPong {
             ball = new GameObject("Ball", Model.SQUARE, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.25f, 0.25f, 1.0f));
             ball.setVelocity(new Vector3f(0.001f, 0.001f, 0.0f));
         }
+
+        if (playerPaddle.isCollidingWith(topBoundary) || playerPaddle.isCollidingWith(bottomBoundary)) {
+            playerPaddle.setVelocity(new Vector3f(0.0f, 0.0f, 0.0f));
+        }
     }
 
     /**
