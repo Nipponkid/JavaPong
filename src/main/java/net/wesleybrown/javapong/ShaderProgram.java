@@ -21,20 +21,39 @@ import java.nio.IntBuffer;
 import org.lwjgl.system.MemoryStack;
 
 /**
- * A shader program that Paddles use.
+ * The shader program that all GameObjects use.
  */
-final class PaddleShaderProgram {
+final class ShaderProgram {
 
-    private static final String vertexShaderSource = "#version 330 core\n" + "layout (location = 0) in vec3 aPos;\n\n"
-            + "uniform mat4 transform;\n" + "void main()\n" + "{\n"
-            + "    gl_Position = transform * vec4(aPos, 1.0f);\n" + "}\n";
+    private static final String vertexShaderSource =
+              "#version 330 core\n\n"
 
-    private static final String fragmentShaderSource = "#version 330 core\n" + "out vec4 FragColor;\n\n"
-            + "void main()\n" + "{\n" + "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n" + "}\n";
+            + "layout (location = 0) in vec3 aPos;\n"
+            + "layout(location = 1) in vec4 vColor;\n\n"
+
+            + "out vec4 color;\n\n"
+
+            + "uniform mat4 transform;\n\n"
+
+            + "void main()\n" + "{\n"
+            + "    color = vColor;\n"
+            + "    gl_Position = transform * vec4(aPos, 1.0f);\n"
+            + "}\n";
+
+    private static final String fragmentShaderSource =
+              "#version 330 core\n\n"
+
+            + "in vec4 color;\n\n"
+
+            + "out vec4 FragColor;\n\n"
+
+            + "void main()\n" + "{\n"
+            + "    FragColor = color;\n"
+            + "}\n";
 
     private int handle;
 
-    PaddleShaderProgram() {
+    ShaderProgram() {
         final int vertexShaderName = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShaderName, vertexShaderSource);
         glCompileShader(vertexShaderName);

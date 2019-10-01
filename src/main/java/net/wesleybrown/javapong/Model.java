@@ -27,7 +27,7 @@ final class Model {
         this.vertices = vertices;
     }
 
-    float[] getVertices() {
+    float[] vertices() {
         return this.vertices;
     }
 }

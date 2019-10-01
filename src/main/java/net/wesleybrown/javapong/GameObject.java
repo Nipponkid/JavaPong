@@ -14,14 +14,17 @@ final class GameObject {
 
     private Vector3f velocity;
 
+    private Material material;
+
     private final GameObjectRenderer renderer;
 
-    GameObject(final String name, final Model model, final Vector3f position, final Vector3f scale) {
+    GameObject(final String name, final Model model, final Vector3f position, final Vector3f scale, final Material material) {
         this.name = name;
         this.position = position;
         this.scale = scale;
         this.velocity = new Vector3f(0.0f, 0.0f, 0.0f);
-        renderer = new GameObjectRenderer(model);
+        this.material = material;
+        renderer = new GameObjectRenderer(model, material);
     }
 
     void update(final float timesliceMS) {

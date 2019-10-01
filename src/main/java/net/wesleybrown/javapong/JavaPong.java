@@ -30,6 +30,7 @@ import static org.lwjgl.opengl.GL30.glClearColor;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import org.lwjgl.opengl.GL;
 
@@ -49,6 +50,10 @@ final class JavaPong {
 
     private GameObject leftBoundary;
     private GameObject rightBoundary;
+
+    private final Material ballMaterial = Material.RED;
+    private final Material paddleMaterial = Material.GREEN;
+    private final Material boundaryMaterial = Material.BLUE;
 
     private JavaPong() {
         // GLFW has to be initialized
@@ -91,17 +96,17 @@ final class JavaPong {
         });
 
         // Set up game
-        playerPaddle = new GameObject("Player Paddle", Model.SQUARE, new Vector3f(3.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
-        opponentPaddle = new GameObject("Opponent Paddle", Model.SQUARE, new Vector3f(-3.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f));
-        ball = new GameObject("Ball", Model.SQUARE, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.25f, 0.25f, 1.0f));
+        playerPaddle = new GameObject("Player Paddle", Model.SQUARE, new Vector3f(3.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f), paddleMaterial);
+        opponentPaddle = new GameObject("Opponent Paddle", Model.SQUARE, new Vector3f(-3.0f, 0.0f, 0.0f), new Vector3f(0.5f, 2.0f, 1.0f), paddleMaterial);
+        ball = new GameObject("Ball", Model.SQUARE, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.25f, 0.25f, 1.0f), ballMaterial);
         ball.setVelocity(new Vector3f(0.001f, 0.001f, 0.0f));
 
         // Boundaries
-        topBoundary = new GameObject("Top Boundary", Model.SQUARE, new Vector3f(0.0f, 4.5f, 0.0f), new Vector3f(10.0f, 1.0f, 1.0f));
-        bottomBoundary = new GameObject("Bottom Boundary", Model.SQUARE, new Vector3f(0.0f, -4.5f, 0.0f), new Vector3f(10.0f, 1.0f, 1.0f));
+        topBoundary = new GameObject("Top Boundary", Model.SQUARE, new Vector3f(0.0f, 4.5f, 0.0f), new Vector3f(10.0f, 1.0f, 1.0f), boundaryMaterial);
+        bottomBoundary = new GameObject("Bottom Boundary", Model.SQUARE, new Vector3f(0.0f, -4.5f, 0.0f), new Vector3f(10.0f, 1.0f, 1.0f), boundaryMaterial);
 
-        leftBoundary = new GameObject("Left Boundary", Model.SQUARE, new Vector3f(-4.5f, 0.0f, 0.0f), new Vector3f(1.0f, 10.0f, 1.0f));
-        rightBoundary = new GameObject("Right Boundary", Model.SQUARE, new Vector3f(4.5f, 0.0f, 0.0f), new Vector3f(1.0f, 10.0f, 1.0f));
+        leftBoundary = new GameObject("Left Boundary", Model.SQUARE, new Vector3f(-4.5f, 0.0f, 0.0f), new Vector3f(1.0f, 10.0f, 1.0f), boundaryMaterial);
+        rightBoundary = new GameObject("Right Boundary", Model.SQUARE, new Vector3f(4.5f, 0.0f, 0.0f), new Vector3f(1.0f, 10.0f, 1.0f), boundaryMaterial);
     }
 
     private void loop() {
@@ -163,7 +168,7 @@ final class JavaPong {
         }
 
         if (ball.isCollidingWith(leftBoundary) || ball.isCollidingWith(rightBoundary)) {
-            ball = new GameObject("Ball", Model.SQUARE, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.25f, 0.25f, 1.0f));
+            ball = new GameObject("Ball", Model.SQUARE, new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.25f, 0.25f, 1.0f), ballMaterial);
             ball.setVelocity(new Vector3f(0.001f, 0.001f, 0.0f));
         }
 
