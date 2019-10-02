@@ -30,7 +30,6 @@ import static org.lwjgl.opengl.GL30.glClearColor;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 import org.lwjgl.opengl.GL;
 
@@ -53,7 +52,8 @@ final class JavaPong {
 
     private final Material ballMaterial = Material.RED;
     private final Material paddleMaterial = Material.GREEN;
-    private final Material boundaryMaterial = Material.BLUE;
+    private final Material topAndBottomBoundaryMaterial = Material.BLUE;
+    private final Material sideBoundaryMaterial = Material.BLACK;
 
     private JavaPong() {
         // GLFW has to be initialized
@@ -102,11 +102,11 @@ final class JavaPong {
         ball.setVelocity(new Vector3f(0.001f, 0.001f, 0.0f));
 
         // Boundaries
-        topBoundary = new GameObject("Top Boundary", Model.SQUARE, new Vector3f(0.0f, 4.5f, 0.0f), new Vector3f(10.0f, 1.0f, 1.0f), boundaryMaterial);
-        bottomBoundary = new GameObject("Bottom Boundary", Model.SQUARE, new Vector3f(0.0f, -4.5f, 0.0f), new Vector3f(10.0f, 1.0f, 1.0f), boundaryMaterial);
+        topBoundary = new GameObject("Top Boundary", Model.SQUARE, new Vector3f(0.0f, 4.5f, 0.0f), new Vector3f(10.0f, 1.0f, 1.0f), topAndBottomBoundaryMaterial);
+        bottomBoundary = new GameObject("Bottom Boundary", Model.SQUARE, new Vector3f(0.0f, -4.5f, 0.0f), new Vector3f(10.0f, 1.0f, 1.0f), topAndBottomBoundaryMaterial);
 
-        leftBoundary = new GameObject("Left Boundary", Model.SQUARE, new Vector3f(-4.5f, 0.0f, 0.0f), new Vector3f(1.0f, 10.0f, 1.0f), boundaryMaterial);
-        rightBoundary = new GameObject("Right Boundary", Model.SQUARE, new Vector3f(4.5f, 0.0f, 0.0f), new Vector3f(1.0f, 10.0f, 1.0f), boundaryMaterial);
+        leftBoundary = new GameObject("Left Boundary", Model.SQUARE, new Vector3f(-4.5f, 0.0f, 0.0f), new Vector3f(1.0f, 8.0f, 1.0f), sideBoundaryMaterial);
+        rightBoundary = new GameObject("Right Boundary", Model.SQUARE, new Vector3f(4.5f, 0.0f, 0.0f), new Vector3f(1.0f, 8.0f, 1.0f), sideBoundaryMaterial);
     }
 
     private void loop() {
