@@ -1,18 +1,21 @@
 package net.wesleybrown.javapong;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.joml.Vector3f;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class RectangleTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void creatingRectangleWithWidthOrHeightLessThanOrEqualToZeroThrowsException() {
-        new Rectangle(new Vector3f(0.0f, 0.0f, 0.0f), 0.0f, 0.0f);
-        new Rectangle(new Vector3f(0.0f, 0.0f, 0.0f), 1.0f, 0.0f);
-        new Rectangle(new Vector3f(0.0f, 0.0f, 0.0f), 0.0f, 1.0f);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            new Rectangle(new Vector3f(0.0f, 0.0f, 0.0f), 0.0f, 0.0f);
+            new Rectangle(new Vector3f(0.0f, 0.0f, 0.0f), 1.0f, 0.0f);
+            new Rectangle(new Vector3f(0.0f, 0.0f, 0.0f), 0.0f, 1.0f);
+        });
     }
 
     @Test

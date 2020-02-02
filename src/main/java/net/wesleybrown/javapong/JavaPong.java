@@ -68,7 +68,7 @@ final class JavaPong {
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);    // Required for macOS
 
         // LWJGL treats GLFWwindow* as long
-        window = glfwCreateWindow(800, 600, "Hello, World!", NULL, NULL);
+        window = glfwCreateWindow(800, 600, "Java Pong", NULL, NULL);
         if (window == NULL) {
             throw new RuntimeException("Failed to create GLFW window");
         }
